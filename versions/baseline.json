@@ -5594,7 +5594,7 @@
     },
     "mapnik": {
       "baseline": "2023-06-12",
-      "port-version": 4
+      "port-version": 5
     },
     "marble": {
       "baseline": "24.02.0",
@@ -8126,7 +8126,7 @@
     },
     "simonbrunel-qtpromise": {
       "baseline": "0.7.0",
-      "port-version": 0
+      "port-version": 1
     },
     "simple-fft": {
       "baseline": "2020-06-14",
