@@ -94,13 +94,12 @@ vcpkg_cmake_configure(
     OPTIONS
         ${FEATURE_OPTIONS}
         "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_LIST_DIR}/cmake-project-include.cmake"
+        #-DCMAKE_REQUIRE_FIND_PACKAGE_cJSON=ON
         -DUSE_VERSION_FROM_GIT_TAG=OFF
         -DWITH_AAD=ON
         -DWITH_CCACHE=OFF
-        -DWITH_CJSON_REQUIRED=ON
         -DWITH_CLANG_FORMAT=OFF
         -DWITH_MANPAGES=OFF
-        -DWITH_OPENSSL=ON
         -DWITH_SAMPLE=OFF
         -DWITH_UNICODE_BUILTIN=ON
         "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
@@ -111,6 +110,7 @@ vcpkg_cmake_configure(
         # Uncontrolled dependencies w.r.t. vcpkg ports, system libs, or tools
         # Can be overriden in custom triplet file
         -DUSE_UNWIND=OFF
+        -DWITH_ABSOLUTE_PLUGIN_LOAD_PATHS=OFF
         -DWITH_ALSA=OFF
         -DWITH_CAIRO=OFF
         -DWITH_CCACHE=OFF
@@ -147,6 +147,7 @@ vcpkg_cmake_configure(
         # Can be overriden in custom triplet file
         -DUSE_UNWIND=OFF
         -DCMAKE_BUILD_TYPE=Release
+        -DWITH_SDL_LINK_SHARED=OFF
     OPTIONS_RELEASE
         -DWITH_VERBOSE_WINPR_ASSERT=OFF
     MAYBE_UNUSED_VARIABLES

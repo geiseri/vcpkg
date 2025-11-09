@@ -3109,8 +3109,13 @@
       "port-version": 9
     },
     "freerdp": {
+<<<<<<< HEAD
       "baseline": "3.19.0",
       "port-version": 0
+=======
+      "baseline": "3.17.2",
+      "port-version": 1
+>>>>>>> 53bb5aeda1 (Add options for the MacOS client)
     },
     "freetds": {
       "baseline": "1.3.10",

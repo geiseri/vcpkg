@@ -1,6 +1,7 @@
 {
   "name": "freerdp",
   "version": "3.19.0",
+  "port-version": 1,
   "description": "A free implementation of the Remote Desktop Protocol (RDP)",
   "homepage": "https://github.com/FreeRDP/FreeRDP",
   "license": "Apache-2.0",
@@ -11,7 +12,10 @@
       "platform": "bsd"
     },
     "json-c",
+<<<<<<< HEAD
     "lodepng",
+=======
+>>>>>>> 7f8932e140 (Add options for the MacOS client)
     "openssl",
     {
       "name": "uriparser",
@@ -92,6 +96,7 @@
             "vulkan"
           ]
         },
+<<<<<<< HEAD
         {
           "name": "sdl3-image",
           "default-features": false,
@@ -100,6 +105,9 @@
             "png"
           ]
         },
+=======
+        "sdl3-image",
+>>>>>>> 7f8932e140 (Add options for the MacOS client)
         {
           "name": "sdl3-ttf",
           "default-features": false,
