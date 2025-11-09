@@ -19,15 +19,19 @@ endif()
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
-        client      WITH_CLIENT
         ffmpeg      WITH_DSP_FFMPEG
         ffmpeg      WITH_FFMPEG
         ffmpeg      WITH_SWSCALE
         server      WITH_SERVER
         urbdrc      CHANNEL_URBDRC
         winpr-tools WITH_WINPR_TOOLS
+        winpr-tools WITH_WINPR_TOOLS_CLI
         x11         WITH_X11
         x11         VCPKG_LOCK_FIND_PACKAGE_X11
+        sdl3        WITH_CLIENT_SDL3
+        sdl3        WITH_SDL_IMAGE_DIALOGS
+        openh264    WITH_OPENH264
+        fdk-aac     WITH_FDK_AAC
 )
 
 if("client" IN_LIST FEATURES)
@@ -38,6 +42,9 @@ if("client" IN_LIST FEATURES)
     elseif(VCPKG_TARGET_IS_OSX)
         message(STATUS "Not building native client components.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_MAC=OFF)
+    elseif(VCPKG_TARGET_IS_WINDOWS)
+        message(STATUS "Not building native client components.")
+        list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_WINDOWS=OFF)
     endif()
 endif()
 
@@ -59,6 +66,11 @@ if (NOT HAS_SHADOW_SUBSYSTEM)
     list(APPEND FEATURE_OPTIONS -DWITH_SHADOW_SUBSYSTEM=OFF -DWITH_SERVER_SHADOW_CLI=OFF)
 endif()
 
+if (VCPKG_TARGET_IS_OSX)
+    #Turned off in upstream config
+    list(APPEND FEATURE_OPTIONS -DCHANNEL_RDPEAR=OFF)
+endif()
+
 vcpkg_find_acquire_program(PKGCONFIG)
 
 vcpkg_cmake_configure(
@@ -67,43 +79,51 @@ vcpkg_cmake_configure(
     OPTIONS
         ${FEATURE_OPTIONS}
         "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_LIST_DIR}/cmake-project-include.cmake"
-        -DCMAKE_REQUIRE_FIND_PACKAGE_cJSON=ON
+        #-DCMAKE_REQUIRE_FIND_PACKAGE_cJSON=ON
         -DUSE_VERSION_FROM_GIT_TAG=OFF
-        -DWITH_ABSOLUTE_PLUGIN_LOAD_PATHS=OFF
         -DWITH_AAD=ON
-        -DWITH_CCACHE=OFF
-        -DWITH_CLANG_FORMAT=OFF
-        -DWITH_MANPAGES=OFF
-        -DWITH_OPENSSL=ON
-        -DWITH_SAMPLE=OFF
-        -DWITH_UNICODE_BUILTIN=ON
-        "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
-        "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
-        # Unmaintained
-        -DWITH_CLIENT_WINDOWS=OFF
-        -DWITH_WAYLAND=OFF
-        # Uncontrolled dependencies w.r.t. vcpkg ports, system libs, or tools
-        # Can be overriden in custom triplet file
-        -DUSE_UNWIND=OFF
+        -DWITH_ABSOLUTE_PLUGIN_LOAD_PATHS=OFF
         -DWITH_ALSA=OFF
         -DWITH_CAIRO=OFF
-        -DWITH_CLIENT_SDL=OFF
+        -DWITH_CCACHE=OFF
+        -DWITH_CLANG_FORMAT=OFF
+        -DWITH_CLIENT_SDL2=OFF
         -DWITH_CUPS=OFF
         -DWITH_FUSE=OFF
+        -DWITH_FAAD2=OFF
+        -DWITH_FAAC=OFF
+        -DWITH_JSONC_REQUIRED=ON
         -DWITH_KRB5=OFF
         -DWITH_LIBSYSTEMD=OFF
+        -DWITH_MANPAGES=OFF
+        -DWITH_OPENSSL=ON
         -DWITH_OPUS=OFF
         -DWITH_OSS=OFF
         -DWITH_PCSC=OFF
         -DWITH_PKCS11=OFF
         -DWITH_PROXY_MODULES=OFF
         -DWITH_PULSE=OFF
-        -DWITH_URIPARSER=OFF
+        # no v2l support
+        -DRDPECAM_CLIENT_CHANNEL_STUB=ON
+        -DWITH_SAMPLE=OFF
+        -DWITH_SDL_LINK_SHARED=OFF
+        -DWITH_SIMD=ON 
+        -DWITH_UNICODE_BUILTIN=ON
+        -DWITH_URIPARSER=ON
+        -DWITH_WAYLAND=OFF
+        -DWITH_WEBVIEW=OFF
+        "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
+        "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
+        # Uncontrolled dependencies w.r.t. vcpkg ports, system libs, or tools
+        # Can be overriden in custom triplet file
+        -DUSE_UNWIND=OFF
+        -DCMAKE_BUILD_TYPE=Release
     OPTIONS_RELEASE
         -DWITH_VERBOSE_WINPR_ASSERT=OFF
     MAYBE_UNUSED_VARIABLES
         MSVC_RUNTIME
         WITH_CLIENT_WINDOWS
+        VCPKG_LOCK_FIND_PACKAGE_X11
 )
 
 vcpkg_cmake_install()
