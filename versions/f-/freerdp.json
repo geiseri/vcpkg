@@ -1,7 +1,11 @@
 {
   "versions": [
     {
-<<<<<<< HEAD
+      "git-tree": "4800eb1efc32d0ed558174a77b6ae15c3aafb97e",
+      "version": "3.19.0",
+      "port-version": 1
+    },
+    {
       "git-tree": "70c735b6ce086c5099305fea71762afce4578a38",
       "version": "3.19.0",
       "port-version": 0
@@ -17,13 +21,6 @@
       "port-version": 1
     },
     {
-=======
-      "git-tree": "0022d20fdcc232252bea37b246ea590c484b0ceb",
-      "version": "3.17.2",
-      "port-version": 1
-    },
-    {
->>>>>>> 53bb5aeda1 (Add options for the MacOS client)
       "git-tree": "5a9d72b56a771354cf51d90840f64221861bea3a",
       "version": "3.17.2",
       "port-version": 0
