@@ -12,6 +12,7 @@
       "platform": "bsd"
     },
     "json-c",
+    "lodepng",
     "openssl",
     {
       "name": "uriparser",
@@ -92,7 +93,14 @@
             "vulkan"
           ]
         },
-        "sdl3-image",
+        {
+          "name": "sdl3-image",
+          "default-features": false,
+          "features": [
+            "jpeg",
+            "png"
+          ]
+        },
         {
           "name": "sdl3-ttf",
           "default-features": false,

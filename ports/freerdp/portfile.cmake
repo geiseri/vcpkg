@@ -37,13 +37,13 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
 if("client" IN_LIST FEATURES)
     # Xcode dependency and untested installation paths
     if(VCPKG_TARGET_IS_IOS)
-        message(STATUS "Not building native client components.")
+        message(STATUS "Not building native client components for iOS.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_IOS=OFF)
     elseif(VCPKG_TARGET_IS_OSX)
-        message(STATUS "Not building native client components.")
+        message(STATUS "Not building native client components for MacOS.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_MAC=OFF)
     elseif(VCPKG_TARGET_IS_WINDOWS)
-        message(STATUS "Not building native client components.")
+        message(STATUS "Not building native client components for Windows.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_WINDOWS=OFF)
     endif()
 endif()
@@ -69,7 +69,22 @@ endif()
 if (VCPKG_TARGET_IS_OSX)
     #Turned off in upstream config
     list(APPEND FEATURE_OPTIONS -DCHANNEL_RDPEAR=OFF)
+    #Do not try to pull in homebrew packages
+	#list(APPEND FEATURE_OPTIONS -DCMAKE_IGNORE_PATH="/opt/local;/usr/local;/opt/homebrew;/Library;~/Library")
+	#list(APPEND FEATURE_OPTIONS -DCMAKE_IGNORE_PREFIX_PATH="/opt/local;/usr/local;/opt/homebrew;/Library;~/Library")
 endif()
+
+if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+    if(WITH_CLIENT_SDL3)
+        list(APPEND FEATURE_OPTIONS -DWITH_SDL_LINK_SHARED=OFF)
+    endif()
+endif()
+
+#file(REMOVE
+    #"${SOURCE_PATH}/cmake/Findlodepng.cmake"
+    #"${SOURCE_PATH}/cmake/FindFFmpeg.cmake"
+    #"${SOURCE_PATH}/cmake/FindFAAC.cmake"
+#)
 
 vcpkg_find_acquire_program(PKGCONFIG)
 
@@ -79,7 +94,6 @@ vcpkg_cmake_configure(
     OPTIONS
         ${FEATURE_OPTIONS}
         "-DCMAKE_PROJECT_INCLUDE=${CMAKE_CURRENT_LIST_DIR}/cmake-project-include.cmake"
-        #-DCMAKE_REQUIRE_FIND_PACKAGE_cJSON=ON
         -DUSE_VERSION_FROM_GIT_TAG=OFF
         -DWITH_AAD=ON
         -DWITH_ABSOLUTE_PLUGIN_LOAD_PATHS=OFF
@@ -95,6 +109,7 @@ vcpkg_cmake_configure(
         -DWITH_JSONC_REQUIRED=ON
         -DWITH_KRB5=OFF
         -DWITH_LIBSYSTEMD=OFF
+        -DWITH_LODEPNG=OFF
         -DWITH_MANPAGES=OFF
         -DWITH_OPENSSL=ON
         -DWITH_OPUS=OFF
@@ -106,7 +121,6 @@ vcpkg_cmake_configure(
         # no v2l support
         -DRDPECAM_CLIENT_CHANNEL_STUB=ON
         -DWITH_SAMPLE=OFF
-        -DWITH_SDL_LINK_SHARED=OFF
         -DWITH_SIMD=ON 
         -DWITH_UNICODE_BUILTIN=ON
         -DWITH_URIPARSER=ON
@@ -114,6 +128,7 @@ vcpkg_cmake_configure(
         -DWITH_WEBVIEW=OFF
         "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
         "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
+        "-DPKG_CONFIG_ARGN=-libs-only-L"
         # Uncontrolled dependencies w.r.t. vcpkg ports, system libs, or tools
         # Can be overriden in custom triplet file
         -DUSE_UNWIND=OFF
