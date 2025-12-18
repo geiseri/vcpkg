@@ -106,8 +106,6 @@ vcpkg_cmake_configure(
         -DWITH_MANPAGES=OFF
         -DWITH_SAMPLE=OFF
         -DWITH_UNICODE_BUILTIN=ON
-        "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
-        "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
         # Unmaintained
         -DWITH_CLIENT_WINDOWS=OFF
         -DWITH_WAYLAND=OFF
@@ -117,8 +115,6 @@ vcpkg_cmake_configure(
         -DWITH_ABSOLUTE_PLUGIN_LOAD_PATHS=OFF
         -DWITH_ALSA=OFF
         -DWITH_CAIRO=OFF
-        -DWITH_CCACHE=OFF
-        -DWITH_CLANG_FORMAT=OFF
         -DWITH_CLIENT_SDL2=OFF
         -DWITH_CUPS=OFF
         -DWITH_FUSE=OFF
@@ -129,7 +125,6 @@ vcpkg_cmake_configure(
         -DWITH_KRB5=OFF
         -DWITH_LIBSYSTEMD=OFF
         -DWITH_LODEPNG=OFF
-        -DWITH_MANPAGES=OFF
         -DWITH_OPENSSL=ON
         -DWITH_OPUS=OFF
         -DWITH_OSS=OFF
@@ -139,9 +134,7 @@ vcpkg_cmake_configure(
         -DWITH_PULSE=OFF
         # no v2l support
         -DRDPECAM_CLIENT_CHANNEL_STUB=ON
-        -DWITH_SAMPLE=OFF
         -DWITH_SIMD=ON 
-        -DWITH_UNICODE_BUILTIN=ON
         -DWITH_URIPARSER=ON
         -DWITH_WAYLAND=OFF
         -DWITH_WEBVIEW=OFF
