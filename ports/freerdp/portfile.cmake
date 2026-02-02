@@ -19,25 +19,33 @@ endif()
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
     FEATURES
-        client      WITH_CLIENT
         ffmpeg      WITH_DSP_FFMPEG
         ffmpeg      WITH_FFMPEG
         ffmpeg      WITH_SWSCALE
         server      WITH_SERVER
         urbdrc      CHANNEL_URBDRC
         winpr-tools WITH_WINPR_TOOLS
+        winpr-tools WITH_WINPR_TOOLS_CLI
         x11         WITH_X11
         x11         VCPKG_LOCK_FIND_PACKAGE_X11
+        sdl3        WITH_CLIENT_SDL3
+        sdl3        WITH_SDL_IMAGE_DIALOGS
+        openh264    WITH_OPENH264
+        fdk-aac     WITH_FDK_AAC
+        uriparser  WITH_URIPARSER
 )
 
 if("client" IN_LIST FEATURES)
     # Xcode dependency and untested installation paths
     if(VCPKG_TARGET_IS_IOS)
-        message(STATUS "Not building native client components.")
+        message(STATUS "Not building native client components for iOS.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_IOS=OFF)
     elseif(VCPKG_TARGET_IS_OSX)
-        message(STATUS "Not building native client components.")
+        message(STATUS "Not building native client components for MacOS.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_MAC=OFF)
+    elseif(VCPKG_TARGET_IS_WINDOWS)
+        message(STATUS "Not building native client components for Windows.")
+        list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_WINDOWS=OFF)
     endif()
 endif()
 
@@ -57,6 +65,22 @@ endif()
 
 if (NOT HAS_SHADOW_SUBSYSTEM)
     list(APPEND FEATURE_OPTIONS -DWITH_SHADOW_SUBSYSTEM=OFF -DWITH_SERVER_SHADOW_CLI=OFF)
+endif()
+
+if (VCPKG_TARGET_IS_OSX)
+    #Turned off in upstream config
+    list(APPEND FEATURE_OPTIONS -DCHANNEL_RDPEAR=OFF)
+endif()
+
+if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+    if(WITH_CLIENT_SDL3)
+        list(APPEND FEATURE_OPTIONS -DWITH_SDL_LINK_SHARED=OFF)
+    endif()
+    if(HAS_SHADOW_SUBSYSTEM)
+        list(APPEND FEATURE_OPTIONS -DRDTK_FORCE_STATIC_BUILD=ON)
+    endif()
+    list(APPEND FEATURE_OPTIONS -DBUILD_SHARED_LIBS=OFF)
+    list(APPEND FEATURE_OPTIONS -DENABLE_STATIC=ON)
 endif()
 
 vcpkg_find_acquire_program(PKGCONFIG)
@@ -87,18 +111,34 @@ vcpkg_cmake_configure(
         -DUSE_UNWIND=OFF
         -DWITH_ALSA=OFF
         -DWITH_CAIRO=OFF
-        -DWITH_CLIENT_SDL=OFF
+        -DWITH_CLIENT_SDL2=OFF
         -DWITH_CUPS=OFF
         -DWITH_FUSE=OFF
+        -DWITH_FAAD2=OFF
+        -DWITH_FAAC=OFF
+        -DFREERDP_UNIFIED_BUILD=ON
+        -DWITH_JSONC_REQUIRED=ON
         -DWITH_KRB5=OFF
         -DWITH_LIBSYSTEMD=OFF
+        -DWITH_LODEPNG=OFF
         -DWITH_OPUS=OFF
         -DWITH_OSS=OFF
         -DWITH_PCSC=OFF
         -DWITH_PKCS11=OFF
         -DWITH_PROXY_MODULES=OFF
         -DWITH_PULSE=OFF
-        -DWITH_URIPARSER=OFF
+        # no v2l support
+        -DRDPECAM_CLIENT_CHANNEL_STUB=ON
+        -DWITH_SIMD=ON 
+        -DWITH_WAYLAND=OFF
+        -DWITH_WEBVIEW=OFF
+        "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
+        "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
+        "-DPKG_CONFIG_ARGN=-libs-only-L"
+        # Uncontrolled dependencies w.r.t. vcpkg ports, system libs, or tools
+        # Can be overriden in custom triplet file
+        -DUSE_UNWIND=OFF
+        -DCMAKE_BUILD_TYPE=Release
     OPTIONS_RELEASE
         -DWITH_VERBOSE_WINPR_ASSERT=OFF
     MAYBE_UNUSED_VARIABLES
