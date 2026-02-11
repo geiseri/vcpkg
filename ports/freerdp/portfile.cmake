@@ -70,6 +70,8 @@ endif()
 if (VCPKG_TARGET_IS_OSX)
     #Turned off in upstream config
     list(APPEND FEATURE_OPTIONS -DCHANNEL_RDPEAR=OFF)
+    list(APPEND FEATURE_OPTIONS	-DCMAKE_IGNORE_PATH='/opt/local;/usr/local;/opt/homebrew;/Library;~/Library')
+	list(APPEND FEATURE_OPTIONS -DCMAKE_IGNORE_PREFIX_PATH='/opt/local;/usr/local;/opt/homebrew;/Library;~/Library')
 endif()
 
 if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
@@ -81,6 +83,9 @@ if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
     endif()
     list(APPEND FEATURE_OPTIONS -DBUILD_SHARED_LIBS=OFF)
     list(APPEND FEATURE_OPTIONS -DENABLE_STATIC=ON)
+    list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_RC4=ON)
+    list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_MD4=ON)
+    list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_MD5=ON)
 endif()
 
 vcpkg_find_acquire_program(PKGCONFIG)

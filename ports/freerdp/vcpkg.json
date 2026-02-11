@@ -48,22 +48,6 @@
         }
       ]
     },
-    "fdk-acc": {
-      "description": "Enable FDK ACC Codec for the client",
-      "dependencies": [
-        {
-          "name": "fdk-acc",
-          "default-features": false
-        },
-        {
-          "name": "freerdp",
-          "default-features": false,
-          "features": [
-            "client"
-          ]
-        }
-      ]
-    },
     "ffmpeg": {
       "description": "Enable image scaling, video and audio with ffmpeg",
       "dependencies": [
