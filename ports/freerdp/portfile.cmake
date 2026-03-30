@@ -27,18 +27,27 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         server      WITH_SERVER
         urbdrc      CHANNEL_URBDRC
         winpr-tools WITH_WINPR_TOOLS
+        winpr-tools WITH_WINPR_TOOLS_CLI
         x11         WITH_X11
         x11         VCPKG_LOCK_FIND_PACKAGE_X11
+        sdl3        WITH_CLIENT_SDL3
+        sdl3        WITH_SDL_IMAGE_DIALOGS
+        openh264    WITH_OPENH264
+        fdk-aac     WITH_FDK_AAC
+        uriparser  WITH_URIPARSER
 )
 
 if("client" IN_LIST FEATURES)
     # Xcode dependency and untested installation paths
     if(VCPKG_TARGET_IS_IOS)
-        message(STATUS "Not building native client components.")
+        message(STATUS "Not building native client components for iOS.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_IOS=OFF)
     elseif(VCPKG_TARGET_IS_OSX)
-        message(STATUS "Not building native client components.")
+        message(STATUS "Not building native client components for MacOS.")
         list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_MAC=OFF)
+    elseif(VCPKG_TARGET_IS_WINDOWS)
+        message(STATUS "Not building native client components for Windows.")
+        list(APPEND FEATURE_OPTIONS -DWITH_CLIENT_WINDOWS=OFF)
     endif()
 endif()
 
@@ -58,6 +67,27 @@ endif()
 
 if (NOT HAS_SHADOW_SUBSYSTEM)
     list(APPEND FEATURE_OPTIONS -DWITH_SHADOW_SUBSYSTEM=OFF -DWITH_SERVER_SHADOW_CLI=OFF)
+endif()
+
+if (VCPKG_TARGET_IS_OSX)
+    #Turned off in upstream config
+    list(APPEND FEATURE_OPTIONS -DCHANNEL_RDPEAR=OFF)
+    list(APPEND FEATURE_OPTIONS	-DCMAKE_IGNORE_PATH='/opt/local;/usr/local;/opt/homebrew;/Library;~/Library')
+	list(APPEND FEATURE_OPTIONS -DCMAKE_IGNORE_PREFIX_PATH='/opt/local;/usr/local;/opt/homebrew;/Library;~/Library')
+endif()
+
+if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+    if(WITH_CLIENT_SDL3)
+        list(APPEND FEATURE_OPTIONS -DWITH_SDL_LINK_SHARED=OFF)
+    endif()
+    if(HAS_SHADOW_SUBSYSTEM)
+        list(APPEND FEATURE_OPTIONS -DRDTK_FORCE_STATIC_BUILD=ON)
+    endif()
+    list(APPEND FEATURE_OPTIONS -DBUILD_SHARED_LIBS=OFF)
+    list(APPEND FEATURE_OPTIONS -DENABLE_STATIC=ON)
+    list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_RC4=ON)
+    list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_MD4=ON)
+    list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_MD5=ON)
 endif()
 
 vcpkg_find_acquire_program(PKGCONFIG)
@@ -88,18 +118,34 @@ vcpkg_cmake_configure(
         -DUSE_UNWIND=OFF
         -DWITH_ALSA=OFF
         -DWITH_CAIRO=OFF
-        -DWITH_CLIENT_SDL=OFF
+        -DWITH_CLIENT_SDL2=OFF
         -DWITH_CUPS=OFF
         -DWITH_FUSE=OFF
+        -DWITH_FAAD2=OFF
+        -DWITH_FAAC=OFF
+        -DFREERDP_UNIFIED_BUILD=ON
+        -DWITH_JSONC_REQUIRED=ON
         -DWITH_KRB5=OFF
         -DWITH_LIBSYSTEMD=OFF
+        -DWITH_LODEPNG=OFF
         -DWITH_OPUS=OFF
         -DWITH_OSS=OFF
         -DWITH_PCSC=OFF
         -DWITH_PKCS11=OFF
         -DWITH_PROXY_MODULES=OFF
         -DWITH_PULSE=OFF
-        -DWITH_URIPARSER=OFF
+        # no v2l support
+        -DRDPECAM_CLIENT_CHANNEL_STUB=ON
+        -DWITH_SIMD=ON 
+        -DWITH_WAYLAND=OFF
+        -DWITH_WEBVIEW=OFF
+        "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
+        "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
+        "-DPKG_CONFIG_ARGN=-libs-only-L"
+        # Uncontrolled dependencies w.r.t. vcpkg ports, system libs, or tools
+        # Can be overriden in custom triplet file
+        -DUSE_UNWIND=OFF
+        -DCMAKE_BUILD_TYPE=Release
     OPTIONS_RELEASE
         -DWITH_VERBOSE_WINPR_ASSERT=OFF
     MAYBE_UNUSED_VARIABLES
@@ -125,6 +171,7 @@ if("server" IN_LIST FEATURES)
         vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/FreeRDP-Shadow3 PACKAGE_NAME freerdp-shadow3 DO_NOT_DELETE_PARENT_CONFIG_PATH)
         list(APPEND tools freerdp-shadow-cli)
     endif()
+    vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/rdtk0 PACKAGE_NAME rdtk0 DO_NOT_DELETE_PARENT_CONFIG_PATH)
 endif()
 if("winpr-tools" IN_LIST FEATURES)
     list(APPEND tools winpr-hash winpr-makecert)
@@ -142,6 +189,9 @@ vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/winpr3/winpr/build-config.
 if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
     # They build static with dllexport, so it must be used with dllexport. Proper fix needs invasive patching.
     vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/freerdp3/freerdp/api.h" "#ifdef FREERDP_EXPORTS" "#if 1")
+    if(WITH_SERVER)
+        vcpkg_replace_string("${CURRENT_PACKAGES_DIR}/include/rdtk0/rdtk/api.h" "#ifdef RDTK_EXPORTS" "#if 1")
+    endif()
 endif()
 
 file(GLOB cmakefiles  "${CURRENT_PACKAGES_DIR}/include/*/CMakeFiles")

@@ -6,12 +6,17 @@
   "license": "Apache-2.0",
   "supports": "!uwp & (!bsd | freebsd)",
   "dependencies": [
-    "cjson",
     {
       "name": "epoll-shim",
       "platform": "bsd"
     },
+    "json-c",
+    "lodepng",
     "openssl",
+    {
+      "name": "uriparser",
+      "default-features": false
+    },
     {
       "name": "vcpkg-cmake",
       "host": true
@@ -29,6 +34,22 @@
     "client": {
       "description": "Build client components"
     },
+    "fdk-aac": {
+      "description": "Enable Fraunhofer FDK AAC Codec for the client",
+      "dependencies": [
+        {
+          "name": "fdk-aac",
+          "default-features": false
+        },
+        {
+          "name": "freerdp",
+          "default-features": false,
+          "features": [
+            "client"
+          ]
+        }
+      ]
+    },
     "ffmpeg": {
       "description": "Enable image scaling, video and audio with ffmpeg",
       "dependencies": [
@@ -39,6 +60,54 @@
             "avcodec",
             "swresample",
             "swscale"
+          ]
+        }
+      ]
+    },
+    "openh264": {
+      "description": "Enable H264 codec support for the client",
+      "dependencies": [
+        {
+          "name": "freerdp",
+          "default-features": false,
+          "features": [
+            "client"
+          ]
+        },
+        {
+          "name": "openh264",
+          "default-features": false
+        }
+      ]
+    },
+    "sdl3": {
+      "description": "Enable SDL3 client support",
+      "supports": "!android & !ios",
+      "dependencies": [
+        {
+          "name": "freerdp",
+          "default-features": false,
+          "features": [
+            "client"
+          ]
+        },
+        {
+          "name": "sdl3",
+          "default-features": false
+        },
+        {
+          "name": "sdl3-image",
+          "default-features": false,
+          "features": [
+            "jpeg",
+            "png"
+          ]
+        },
+        {
+          "name": "sdl3-ttf",
+          "default-features": false,
+          "features": [
+            "harfbuzz"
           ]
         }
       ]
@@ -67,8 +136,11 @@
       "supports": "!android & !ios & !uwp"
     },
     "x11": {
-      "description": "Enable X11 support",
-      "supports": "!android & !ios & !windows & !osx"
+      "description": "Enable X11 client support",
+      "supports": "!android & !ios & !windows & !osx",
+      "dependencies": [
+        "xcb"
+      ]
     }
   }
 }
