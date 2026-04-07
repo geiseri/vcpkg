@@ -62,6 +62,9 @@ if("server" IN_LIST FEATURES)
     # actual platform server implementation
     if(VCPKG_TARGET_IS_OSX OR VCPKG_TARGET_IS_WINDOWS) # implementation unmaintained
         list(APPEND FEATURE_OPTIONS -DWITH_PLATFORM_SERVER=OFF)
+        list(APPEND FEATURE_OPTIONS -DWITH_RDTK=OFF)
+    else()
+        list(APPEND FEATURE_OPTIONS -DWITH_RDTK=ON)
     endif()
 endif()
 
@@ -80,14 +83,11 @@ if(VCPKG_LIBRARY_LINKAGE STREQUAL "static")
     if(WITH_CLIENT_SDL3)
         list(APPEND FEATURE_OPTIONS -DWITH_SDL_LINK_SHARED=OFF)
     endif()
-    if(HAS_SHADOW_SUBSYSTEM)
-        list(APPEND FEATURE_OPTIONS -DRDTK_FORCE_STATIC_BUILD=ON)
-    endif()
     list(APPEND FEATURE_OPTIONS -DBUILD_SHARED_LIBS=OFF)
-    list(APPEND FEATURE_OPTIONS -DENABLE_STATIC=ON)
     list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_RC4=ON)
     list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_MD4=ON)
     list(APPEND FEATURE_OPTIONS -DWITH_INTERNAL_MD5=ON)
+    list(APPEND FEATURE_OPTIONS "-DPKG_CONFIG_ARGN=-libs-only-L")
 endif()
 
 vcpkg_find_acquire_program(PKGCONFIG)
@@ -136,12 +136,10 @@ vcpkg_cmake_configure(
         -DWITH_PULSE=OFF
         # no v2l support
         -DRDPECAM_CLIENT_CHANNEL_STUB=ON
-        -DWITH_SIMD=ON 
+        -DWITH_SIMD=ON
         -DWITH_WAYLAND=OFF
         -DWITH_WEBVIEW=OFF
         "-DMSVC_RUNTIME=${VCPKG_CRT_LINKAGE}"
-        "-DPKG_CONFIG_EXECUTABLE=${PKGCONFIG}"
-        "-DPKG_CONFIG_ARGN=-libs-only-L"
         # Uncontrolled dependencies w.r.t. vcpkg ports, system libs, or tools
         # Can be overriden in custom triplet file
         -DUSE_UNWIND=OFF
