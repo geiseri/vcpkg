@@ -8,7 +8,7 @@
   "dependencies": [
     {
       "name": "epoll-shim",
-      "platform": "bsd"
+      "platform": "osx"
     },
     "json-c",
     "lodepng",
